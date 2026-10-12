@@ -1,0 +1,41 @@
+# ==============================
+# OPENAI LLM
+# ==============================
+openai
+langchain-openai
+
+# ==============================
+# LANGCHAIN CORE / LCEL / RUNNABLES
+# ==============================
+langchain
+langchain-core
+langchain-community
+
+# ==============================
+# AGENTS / REACT WORKFLOWS
+# ==============================
+langgraph
+
+# ==============================
+# TAVILY WEB SEARCH TOOL
+# ==============================
+langchain-tavily
+tavily
+# ==============================
+# BEAUTIFULSOUP WEB SCRAPING
+# ==============================
+beautifulsoup4
+requests
+lxml
+
+# ==============================
+# ENVIRONMENT VARIABLES / VALIDATION
+# ==============================
+python-dotenv
+pydantic
+
+# ==============================
+# OPTIONAL: RETRY UTILITIES
+# ==============================
+tenacity
+rich
