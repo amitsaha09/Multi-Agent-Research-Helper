@@ -14,9 +14,9 @@ Type any topic. Four AI stages — search, read, write, critique — collaborate
 
 ```mermaid
 flowchart LR
-    A["❓ Topic"] --> B["🔍 Search Agent<br/>Tavily web search<br/>create_agent (ReAct)"]
-    B --> C["🔗 Top URLs"]
-    C --> D["📖 Reader Agent<br/>BeautifulSoup scrape<br/>create_agent (ReAct)"]
+    A --> B["🔍 Search Agent<br/>Tavily: 5 results<br/>create_agent (ReAct)"]
+    B --> C["🔗 URLs + Snippets"]
+    C --> D["📖 Reader Agent<br/>picks the most relevant URL<br/>BeautifulSoup scrape, 3000 chars"]
     D --> E["📝 Article Content"]
     E --> F["✍️ Writer Chain<br/>LLM prompt chain<br/>structured report"]
     F --> G["📄 Draft Report"]
@@ -34,12 +34,16 @@ A shared state dictionary carries data between stages — each stage reads what 
 ## 📁 Project Structure
 
 ```
-├── app.py               # Streamlit web UI — live stage tracking, report download
+├── app.py               # Streamlit web UI — custom dark theme, live 4-stage tracker
+│                        # with per-stage timing, metrics row, tabs
+│                        # (Report / Critic feedback / Sources / Scraped content),
+│                        # report download as .md
 ├── pipeline.py          # Core pipeline: runs the 4 stages in order
-├── pipeline_terminal.py # CLI version — ask from the terminal
+│                        # (CLI entry: python pipeline.py)
+├── pipeline_terminal.py # Earlier standalone variant of the pipeline (no UI callbacks)
 ├── agents.py            # Two create_agent tool-calling agents + writer/critic chains
-├── tools.py             # The two tools: web_search (Tavily), scrape_url (BeautifulSoup)
-├── config.toml          # App configuration (theme/settings)
+├── tools.py             # web_search (Tavily, 5 results) and scrape_url (BeautifulSoup)
+├── config.toml          # Streamlit theme — move into a .streamlit/ folder to take effect
 └── requirements.txt
 ```
 
@@ -65,7 +69,7 @@ streamlit run app.py
 **Terminal:**
 
 ```bash
-python pipeline_terminal.py
+python pipeline.py
 ```
 
 ## 🧠 Design Decisions
@@ -77,17 +81,14 @@ python pipeline_terminal.py
 | **Shared state dict** | A plain dictionary is enough to pass data through a linear 4-stage pipeline — no framework overhead. |
 | **LLM-as-judge critic** | A second model scoring the first model's output closes the loop: every report ships with a /10 score, strengths, and concrete improvements. |
 | **temperature = 0** | Research reports must be factual and consistent — zero temperature removes creative drift. |
-| **Character limits on scraped content** | Full articles are huge; truncating scraped text controls token cost per run. |
+| **Character limits on scraped content** | Full articles are huge; scraped text is capped at 3000 chars, search snippets at 300 chars, and the reader only sees the first 800 chars of search results — this controls token cost per run. |
 | **Tavily for search** | Built for LLMs — returns clean, relevant snippets instead of raw search-engine HTML. |
-| **User approval before tool calls** | The agent asks before acting, so no surprise API calls or scraping. |
 
 ## 🛠️ Tech Stack
 
 Python · LangChain (`create_agent`) · OpenAI (GPT-4o-mini) · Tavily · BeautifulSoup4 · Streamlit · Python-dotenv
 
-## 📌 Improvements over the reference build
+## 🔜 Roadmap
 
 - Reader scrapes the top **3 URLs** instead of 1, for richer reports
 - User approval step before the agent calls tools
-
-*(Edit these two lines to match exactly what you built.)*
